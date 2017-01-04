@@ -142,6 +142,7 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject resultItem = jArray.getJSONObject(i);
                 movies.add(new Movie(
+                        resultItem.getInt("id"),
                         resultItem.getString("original_title"),
                         resultItem.getString("poster_path"),
                         resultItem.getString("overview"),
