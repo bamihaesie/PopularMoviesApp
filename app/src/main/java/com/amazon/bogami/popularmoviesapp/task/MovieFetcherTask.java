@@ -70,7 +70,7 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
             return new ArrayList<>();
         }
 
-        URL url = UrlBuilder.getUrl(sortingOrders[0], apiKey);
+        URL url = buildUrl(apiKey, sortingOrders[0]);
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -117,6 +117,21 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
         }
 
         return convertJson(jsonResponse);
+    }
+
+    private URL buildUrl(String apiKey, SortingOrder sortingOrder) {
+        URL url;
+        switch (sortingOrder) {
+            case POPULARITY:
+                url = UrlBuilder.getPopularMoviesUrl(apiKey);
+                break;
+            case TOP_RATED:
+                url = UrlBuilder.getTopRatedMoviesUrl(apiKey);
+                break;
+            default:
+                throw new RuntimeException("Unsupported sorting order");
+        }
+        return url;
     }
 
     private List<Movie> convertJson(String jsonResponse) {
