@@ -23,9 +23,16 @@
         </activity>
         <activity
             android:name=".activity.DetailActivity"
+            android:configChanges="orientation"
             android:parentActivityName=".activity.BrowseActivity">
 
         </activity>
+        <service
+            android:name=".service.MovieReviewsService"
+            android:exported="false"/>
+        <service
+            android:name=".service.MovieVideosService"
+            android:exported="false"/>
     </application>
 
 </manifest>

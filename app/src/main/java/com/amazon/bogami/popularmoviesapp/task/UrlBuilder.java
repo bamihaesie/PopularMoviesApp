@@ -15,6 +15,14 @@ public class UrlBuilder {
         return getUrl("top_rated", apiKey);
     }
 
+    public static URL getMovieReviewsUrl(int movieId, String apiKey) {
+        return getUrl(movieId + "/reviews", apiKey);
+    }
+
+    public static URL getMovieVideosUrl(int movieId, String apiKey) {
+        return getUrl(movieId + "/videos", apiKey);
+    }
+
     private static URL getUrl(String suffix, String apiKey) {
         URL url = null;
         try {

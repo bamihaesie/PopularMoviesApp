@@ -6,15 +6,14 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.amazon.bogami.popularmoviesapp.adapter.ImageListAdapter;
 import com.amazon.bogami.popularmoviesapp.R;
 import com.amazon.bogami.popularmoviesapp.activity.DetailActivity;
+import com.amazon.bogami.popularmoviesapp.adapter.ImageListAdapter;
 import com.amazon.bogami.popularmoviesapp.model.Movie;
 import com.amazon.bogami.popularmoviesapp.model.SortingOrder;
 
@@ -22,11 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,49 +66,7 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
 
         URL url = buildUrl(apiKey, sortingOrders[0]);
 
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        String jsonResponse = null;
-
-        try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                jsonResponse = null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                jsonResponse = null;
-            }
-
-            jsonResponse = buffer.toString();
-
-        } catch (Exception e) {
-            Log.e("MovieFetcherTask", "Error ", e);
-            jsonResponse = null;
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e("MovieFetcherTask", "Error closing stream", e);
-                }
-            }
-        }
+        String jsonResponse = WebResourceDownloader.downloadResource(url);
 
         return convertJson(jsonResponse);
     }
