@@ -1,8 +1,6 @@
 package com.amazon.bogami.popularmoviesapp.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -25,8 +23,6 @@ import java.util.List;
 
 public class BrowseActivityFragment extends Fragment {
 
-    private static final String SORTING_ORDER_STATE = "sortingOrderState";
-
     private View view;
 
     private SortingOrder sortingOrder;
@@ -37,18 +33,11 @@ public class BrowseActivityFragment extends Fragment {
         setHasOptionsMenu(true);
         view = inflater.inflate(R.layout.fragment_browse, container, false);
 
-        sortingOrder = restoreSortingOrder();
+        sortingOrder = SortingOrder.POPULARITY;
 
         handleSortingOrder(sortingOrder);
 
         return view;
-    }
-
-    private SortingOrder restoreSortingOrder() {
-        SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String storedSortingOrder = preferences.getString(SORTING_ORDER_STATE, SortingOrder.POPULARITY.name());
-
-        return SortingOrder.valueOf(storedSortingOrder);
     }
 
     @Override
@@ -78,9 +67,6 @@ public class BrowseActivityFragment extends Fragment {
     }
 
     private void handleSortingOrder(SortingOrder sortingOrder) {
-
-        saveSortingOrder(sortingOrder);
-
         switch (sortingOrder) {
             case FAVORITES:
                 displayFavorites();
@@ -89,13 +75,6 @@ public class BrowseActivityFragment extends Fragment {
                 new MovieFetcherTask(view, getContext(), getActivity()).execute(sortingOrder);
                 break;
         }
-    }
-
-    private void saveSortingOrder(SortingOrder sortingOrder) {
-        SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = preferences.edit();
-        edit.putString(SORTING_ORDER_STATE, sortingOrder.name());
-        edit.commit();
     }
 
     private void displayFavorites() {
