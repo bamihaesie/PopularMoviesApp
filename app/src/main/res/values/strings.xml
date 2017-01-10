@@ -2,7 +2,8 @@
     <string name="app_name">PopularMoviesApp</string>
     <string name="menu_item_popular">Sort by popularity</string>
     <string name="menu_item_top_rated">Sort by top rated</string>
+    <string name="menu_item_favorites">View favorites</string>
     <string name="posterDescription">movie poster</string>
-    <string name="userRating">Rating: %1$s</string>
+    <string name="userRating">Rating: %1$s/10</string>
     <string name="apiKey"></string>
 </resources>

@@ -1,6 +1,11 @@
 package com.amazon.bogami.popularmoviesapp.task;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
+
+import com.amazon.bogami.popularmoviesapp.NoNetworkConnectivityException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +16,12 @@ import java.net.URL;
 
 public class WebResourceDownloader {
 
-    public static String downloadResource(URL url) {
+    public static String downloadResource(Context context, URL url) throws NoNetworkConnectivityException {
+
+        if (!isOnline(context)) {
+            throw new NoNetworkConnectivityException();
+        }
+
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -57,6 +67,13 @@ public class WebResourceDownloader {
         }
 
         return jsonResponse;
+    }
+
+    private static boolean isOnline(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
 }

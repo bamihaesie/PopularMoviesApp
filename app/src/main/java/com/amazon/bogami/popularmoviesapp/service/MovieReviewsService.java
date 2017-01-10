@@ -3,6 +3,7 @@ package com.amazon.bogami.popularmoviesapp.service;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.amazon.bogami.popularmoviesapp.NoNetworkConnectivityException;
 import com.amazon.bogami.popularmoviesapp.model.Review;
 import com.amazon.bogami.popularmoviesapp.task.UrlBuilder;
 import com.amazon.bogami.popularmoviesapp.task.WebResourceDownloader;
@@ -14,6 +15,7 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static com.amazon.bogami.popularmoviesapp.activity.DetailActivity.NO_CONNECTIVITY;
 import static com.amazon.bogami.popularmoviesapp.activity.DetailActivity.REVIEWS_AVAILABLE;
 
 public class MovieReviewsService extends IntentService {
@@ -32,11 +34,15 @@ public class MovieReviewsService extends IntentService {
         String apiKey = intent.getStringExtra(API_KEY_ARG);
 
         URL movieReviewsUrl = UrlBuilder.getMovieReviewsUrl(movieId, apiKey);
-        String responseJson = WebResourceDownloader.downloadResource(movieReviewsUrl);
 
-        ArrayList<Review> reviews =  convertResponse(responseJson);
-
-        broadcastReviews(reviews);
+        try {
+            String responseJson =
+                    WebResourceDownloader.downloadResource(getApplicationContext(), movieReviewsUrl);
+            ArrayList<Review> reviews =  convertResponse(responseJson);
+            broadcastReviews(reviews);
+        } catch (NoNetworkConnectivityException e) {
+            broadcastNoNetworkConnectivity();
+        }
     }
 
     private void broadcastReviews(ArrayList<Review> reviews) {
@@ -44,6 +50,13 @@ public class MovieReviewsService extends IntentService {
         broadcastIntent.setAction(REVIEWS_AVAILABLE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putParcelableArrayListExtra(PARAM_OUT_REVIEWS, reviews);
+        sendBroadcast(broadcastIntent);
+    }
+
+    private void broadcastNoNetworkConnectivity() {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(NO_CONNECTIVITY);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         sendBroadcast(broadcastIntent);
     }
 

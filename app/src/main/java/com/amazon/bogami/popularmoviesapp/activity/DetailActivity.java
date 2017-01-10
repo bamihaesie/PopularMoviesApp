@@ -4,15 +4,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.amazon.bogami.popularmoviesapp.FavoriteMoviesDAO;
 import com.amazon.bogami.popularmoviesapp.R;
 import com.amazon.bogami.popularmoviesapp.adapter.ReviewListAdapter;
 import com.amazon.bogami.popularmoviesapp.adapter.TrailerListAdapter;
@@ -34,6 +39,7 @@ import butterknife.ButterKnife;
 public class DetailActivity extends AppCompatActivity {
 
     public static final String REVIEWS_AVAILABLE = "ReviewsAvailable";
+    public static final String NO_CONNECTIVITY = "NoConnectivity";
     public static final String TRAILERS_AVAILABLE = "TrailersAvailable";
 
     @BindView(R.id.originalTitle) TextView titleView;
@@ -44,6 +50,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private MovieReviewsReceiver movieReviewsReceiver;
     private MovieTrailersReceiver movieTrailersReceiver;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +62,8 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Movie selectedMovie = intent.getParcelableExtra("movie");
+
+        addListenerOnButton(selectedMovie);
 
         String apiKey = getResources().getString(R.string.apiKey);
         fetchReviews(selectedMovie.getId(), apiKey);
@@ -70,6 +79,18 @@ public class DetailActivity extends AppCompatActivity {
         plotSynopsisView.setText(selectedMovie.getPlotSynopsis());
 
         Picasso.with(getApplicationContext()).load("http://image.tmdb.org/t/p/w500/" + selectedMovie.getPosterPath()).into(imageView);
+    }
+
+    private void addListenerOnButton(final Movie selectedMovie) {
+        button = (Button) findViewById(R.id.favoriteButton);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FavoriteMoviesDAO favoriteMoviesDAO = new FavoriteMoviesDAO(DetailActivity.this);
+                favoriteMoviesDAO.addMovieToFavorites(selectedMovie);
+            }
+        });
     }
 
     private String getFormattedDate(String dateString) {
@@ -122,6 +143,7 @@ public class DetailActivity extends AppCompatActivity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         movieReviewsReceiver = new MovieReviewsReceiver();
         registerReceiver(movieReviewsReceiver, filter);
+        registerReceiver(movieReviewsReceiver, getNoConnectivityFilter());
     }
 
     private void registerTrailersReceiver() {
@@ -129,6 +151,13 @@ public class DetailActivity extends AppCompatActivity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         movieTrailersReceiver = new MovieTrailersReceiver();
         registerReceiver(movieTrailersReceiver, filter);
+        registerReceiver(movieTrailersReceiver, getNoConnectivityFilter());
+    }
+
+    private IntentFilter getNoConnectivityFilter() {
+        IntentFilter filter = new IntentFilter(NO_CONNECTIVITY);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        return filter;
     }
 
     private void displayBackButton() {
@@ -159,6 +188,18 @@ public class DetailActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            if(intent.getAction().equals(NO_CONNECTIVITY)) {
+                DetailActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            "No network connectivity", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return;
+            }
+
             ArrayList<Review> reviewList =
                     intent.getParcelableArrayListExtra(MovieReviewsService.PARAM_OUT_REVIEWS);
 
@@ -168,9 +209,6 @@ public class DetailActivity extends AppCompatActivity {
 //            listView.addHeaderView(findViewById(R.id.reviews_heading));
             listView.setAdapter(adapter);
 
-            for (Review review : reviewList) {
-                System.out.println(review);
-            }
         }
     }
 
@@ -178,6 +216,18 @@ public class DetailActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            if(intent.getAction().equals(NO_CONNECTIVITY)) {
+                DetailActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "No network connectivity", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return;
+            }
+
             ArrayList<Trailer> trailerList =
                     intent.getParcelableArrayListExtra(MovieVideosService.PARAM_OUT_VIDEOS);
 

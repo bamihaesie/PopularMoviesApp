@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.amazon.bogami.popularmoviesapp.NoNetworkConnectivityException;
 import com.amazon.bogami.popularmoviesapp.R;
 import com.amazon.bogami.popularmoviesapp.activity.DetailActivity;
 import com.amazon.bogami.popularmoviesapp.adapter.ImageListAdapter;
@@ -39,18 +40,6 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
 
     @Override
     protected List<Movie> doInBackground(SortingOrder... sortingOrders) {
-
-        if (!isOnline()) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, "No network connectivity", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            return new ArrayList<>();
-        }
-
         String apiKey = activity.getResources().getString(R.string.apiKey);
 
         if (apiKey == null || apiKey.isEmpty()) {
@@ -66,7 +55,19 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
 
         URL url = buildUrl(apiKey, sortingOrders[0]);
 
-        String jsonResponse = WebResourceDownloader.downloadResource(url);
+        String jsonResponse;
+        try {
+            jsonResponse = WebResourceDownloader.downloadResource(context, url);
+        } catch (NoNetworkConnectivityException e) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "No network connectivity", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            return new ArrayList<>();
+        }
 
         return convertJson(jsonResponse);
     }

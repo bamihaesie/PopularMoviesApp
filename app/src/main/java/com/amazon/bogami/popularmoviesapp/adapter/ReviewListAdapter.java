@@ -38,8 +38,8 @@ public class ReviewListAdapter extends ArrayAdapter<Review> {
         TextView reviewAuthorView = (TextView) convertView.findViewById(R.id.review_author);
         reviewAuthorView.setText(reviewList.get(position).getAuthor());
 
-//        TextView reviewContentView = (TextView) convertView.findViewById(R.id.review_content);
-//        reviewContentView.setText(reviewList.get(position).getContent());
+        TextView reviewContentView = (TextView) convertView.findViewById(R.id.review_content);
+        reviewContentView.setText(reviewList.get(position).getContent());
 
         return convertView;
     }
