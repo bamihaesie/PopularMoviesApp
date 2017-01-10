@@ -82,6 +82,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Trailers:"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_marginTop="46dp"
                     android:id="@+id/trailers_heading" />
                 <android.support.v7.widget.RecyclerView
@@ -99,6 +101,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Reviews:"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_marginTop="46dp"
                     android:id="@+id/reviews_heading" />
                 <android.support.v7.widget.RecyclerView

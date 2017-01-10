@@ -3,8 +3,6 @@ package com.amazon.bogami.popularmoviesapp.task;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
@@ -133,12 +131,5 @@ public class MovieFetcherTask extends AsyncTask<SortingOrder, Integer, List<Movi
                 activity.startActivity(intent);
             }
         });
-    }
-
-    private boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

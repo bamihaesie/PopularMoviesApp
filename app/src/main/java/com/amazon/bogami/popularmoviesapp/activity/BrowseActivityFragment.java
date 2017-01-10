@@ -1,8 +1,9 @@
 package com.amazon.bogami.popularmoviesapp.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,23 +25,11 @@ import java.util.List;
 
 public class BrowseActivityFragment extends Fragment {
 
-    private static final String STATE_SORTING_ORDER = "sortingOrder";
+    private static final String SORTING_ORDER_STATE = "sortingOrderState";
 
     private View view;
 
     private SortingOrder sortingOrder;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        setRetainInstance(true);
-        super.onCreate(savedInstanceState);System.out.println(this);
-
-        if (savedInstanceState != null) {
-            sortingOrder = (SortingOrder) savedInstanceState.getSerializable(STATE_SORTING_ORDER);
-        } else {
-            sortingOrder = SortingOrder.POPULARITY;
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,15 +37,18 @@ public class BrowseActivityFragment extends Fragment {
         setHasOptionsMenu(true);
         view = inflater.inflate(R.layout.fragment_browse, container, false);
 
+        sortingOrder = restoreSortingOrder();
+
         handleSortingOrder(sortingOrder);
 
         return view;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable(STATE_SORTING_ORDER, sortingOrder);
+    private SortingOrder restoreSortingOrder() {
+        SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String storedSortingOrder = preferences.getString(SORTING_ORDER_STATE, SortingOrder.POPULARITY.name());
+
+        return SortingOrder.valueOf(storedSortingOrder);
     }
 
     @Override
@@ -86,6 +78,9 @@ public class BrowseActivityFragment extends Fragment {
     }
 
     private void handleSortingOrder(SortingOrder sortingOrder) {
+
+        saveSortingOrder(sortingOrder);
+
         switch (sortingOrder) {
             case FAVORITES:
                 displayFavorites();
@@ -96,19 +91,24 @@ public class BrowseActivityFragment extends Fragment {
         }
     }
 
+    private void saveSortingOrder(SortingOrder sortingOrder) {
+        SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = preferences.edit();
+        edit.putString(SORTING_ORDER_STATE, sortingOrder.name());
+        edit.commit();
+    }
+
     private void displayFavorites() {
 
         FavoriteMoviesDAO favoriteMoviesDAO = new FavoriteMoviesDAO(getActivity());
         final List<Movie> movies = favoriteMoviesDAO.getFavoriteMovies();
-
-        System.out.println("Found " + movies.size() + " movies!");
 
         String[] moviePosters = new String[movies.size()];
         for (int i = 0; i < movies.size(); i++) {
             moviePosters[i] = "http://image.tmdb.org/t/p/w185/" + movies.get(i).getPosterPath();
         }
 
-        GridView gridview = (GridView) getActivity().findViewById(R.id.gridview);
+        GridView gridview = (GridView) view.findViewById(R.id.gridview);
         ImageListAdapter adapter = new ImageListAdapter(getActivity(), moviePosters);
         gridview.setAdapter(adapter);
 
