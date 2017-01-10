@@ -1,10 +1,13 @@
 package com.amazon.bogami.popularmoviesapp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.amazon.bogami.popularmoviesapp.R;
@@ -28,13 +31,26 @@ public class TrailerListAdapter extends ArrayAdapter<Trailer> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         if (null == convertView) {
             convertView = inflater.inflate(R.layout.trailer_item, parent, false);
         }
 
         TextView trailerNameView = (TextView) convertView.findViewById(R.id.trailer_name);
         trailerNameView.setText(trailerList.get(position).getName());
+
+        Button button = (Button) convertView.findViewById(R.id.playButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.startActivity(
+                    new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("http://www.youtube.com/watch?v=" + trailerList.get(position).getKey())
+                    )
+                );
+            }
+        });
 
         return convertView;
     }
