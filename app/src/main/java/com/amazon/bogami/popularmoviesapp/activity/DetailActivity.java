@@ -4,16 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -203,11 +203,13 @@ public class DetailActivity extends AppCompatActivity {
             ArrayList<Review> reviewList =
                     intent.getParcelableArrayListExtra(MovieReviewsService.PARAM_OUT_REVIEWS);
 
-            ArrayAdapter adapter = new ReviewListAdapter(context, reviewList);
+            ReviewListAdapter adapter = new ReviewListAdapter(reviewList);
 
-            ListView listView = (ListView) findViewById(R.id.reviews);
-//            listView.addHeaderView(findViewById(R.id.reviews_heading));
-            listView.setAdapter(adapter);
+            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.reviews);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
 
         }
     }
@@ -231,11 +233,13 @@ public class DetailActivity extends AppCompatActivity {
             ArrayList<Trailer> trailerList =
                     intent.getParcelableArrayListExtra(MovieVideosService.PARAM_OUT_VIDEOS);
 
-            ArrayAdapter adapter = new TrailerListAdapter(context, trailerList);
+            TrailerListAdapter adapter = new TrailerListAdapter(context, trailerList);
 
-            ListView listView = (ListView) findViewById(R.id.trailers);
-            //listView.addHeaderView(findViewById(R.id.trailers_heading));
-            listView.setAdapter(adapter);
+            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.trailers);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
         }
     }
 }

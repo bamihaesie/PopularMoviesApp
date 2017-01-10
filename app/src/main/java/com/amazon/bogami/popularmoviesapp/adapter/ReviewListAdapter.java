@@ -1,61 +1,54 @@
 package com.amazon.bogami.popularmoviesapp.adapter;
 
-import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amazon.bogami.popularmoviesapp.R;
 import com.amazon.bogami.popularmoviesapp.model.Review;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class ReviewListAdapter extends ArrayAdapter<Review> {
-    private Context context;
-    private LayoutInflater inflater;
+public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.ViewHolder> {
 
     private ArrayList<Review> reviewList;
 
-    public ReviewListAdapter(Context context, ArrayList<Review> reviewList) {
-        super(context, R.layout.review_item, reviewList);
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        this.context = context;
-        this.reviewList = reviewList;
+        public TextView author;
+        public TextView content;
 
-        inflater = LayoutInflater.from(context);
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (null == convertView) {
-            convertView = inflater.inflate(R.layout.review_item, parent, false);
+        public ViewHolder(View v) {
+            super(v);
+            author = (TextView) v.findViewById(R.id.review_author);
+            content = (TextView) v.findViewById(R.id.review_content);
         }
+    }
 
-        TextView reviewAuthorView = (TextView) convertView.findViewById(R.id.review_author);
-        reviewAuthorView.setText(reviewList.get(position).getAuthor());
+    public ReviewListAdapter(ArrayList<Review> reviewList) {
+        this.reviewList = reviewList;
+    }
 
-        TextView reviewContentView = (TextView) convertView.findViewById(R.id.review_content);
-        reviewContentView.setText(reviewList.get(position).getContent());
+    public ReviewListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        return convertView;
+        View convertView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.review_item, parent, false);
+
+        ViewHolder vh = new ViewHolder(convertView);
+        return vh;
     }
 
     @Override
-    public int getCount() {
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Review review = reviewList.get(position);
+        holder.author.setText(review.getAuthor());
+        holder.content.setText(review.getContent());
+    }
+
+    @Override
+    public int getItemCount() {
         return reviewList.size();
-    }
-
-    @Override
-    public Review getItem(int position) {
-        return reviewList.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
     }
 }

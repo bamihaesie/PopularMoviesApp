@@ -84,9 +84,9 @@
                     android:text="Trailers:"
                     android:layout_marginTop="46dp"
                     android:id="@+id/trailers_heading" />
-                <ListView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/trailers"
-                    android:nestedScrollingEnabled="true"
+                    android:scrollbars="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
@@ -101,9 +101,9 @@
                     android:text="Reviews:"
                     android:layout_marginTop="46dp"
                     android:id="@+id/reviews_heading" />
-                <ListView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/reviews"
-                    android:nestedScrollingEnabled="true"
+                    android:scrollbars="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
