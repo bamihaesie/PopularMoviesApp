@@ -23,6 +23,8 @@ import java.util.List;
 
 public class BrowseActivityFragment extends Fragment {
 
+    private static final String SORTING_ORDER_STATE = "sortingOrderState";
+
     private View view;
 
     private SortingOrder sortingOrder;
@@ -33,7 +35,11 @@ public class BrowseActivityFragment extends Fragment {
         setHasOptionsMenu(true);
         view = inflater.inflate(R.layout.fragment_browse, container, false);
 
-        sortingOrder = SortingOrder.POPULARITY;
+        if (savedInstanceState != null) {
+            sortingOrder = (SortingOrder) savedInstanceState.getSerializable(SORTING_ORDER_STATE);
+        } else {
+            sortingOrder = SortingOrder.POPULARITY;
+        }
 
         handleSortingOrder(sortingOrder);
 
@@ -75,6 +81,12 @@ public class BrowseActivityFragment extends Fragment {
                 new MovieFetcherTask(view, getContext(), getActivity()).execute(sortingOrder);
                 break;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(SORTING_ORDER_STATE, sortingOrder);
     }
 
     private void displayFavorites() {
